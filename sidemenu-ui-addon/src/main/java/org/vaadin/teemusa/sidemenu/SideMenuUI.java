@@ -1,5 +1,7 @@
 package org.vaadin.teemusa.sidemenu;
 
+import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Viewport;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -20,6 +22,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+@Viewport("user-scalable=no,initial-scale=1.0")
+@Theme("valo")
 public abstract class SideMenuUI extends UI {
 
 	public interface MenuClickHandler {

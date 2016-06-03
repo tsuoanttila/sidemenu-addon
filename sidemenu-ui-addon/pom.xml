@@ -28,11 +28,11 @@
 		<Vaadin-Addon>${project.artifactId}-${project.version}.jar</Vaadin-Addon>
 	</properties>
 
-    <!--     
 	<organization>
-		<name>My Name</name>
-		<url>https://github.com/mygithubaccount/SideMenuUI/</url>
+		<name>Teemu Suo-Anttila</name>
+		<url>https://github.com/tsuoanttila/SideMenuUI/</url>
 	</organization>
+<!--
     
 	<scm>
 		<url>git://github.com/mygithubaccount/SideMenuUI.git</url>
@@ -124,7 +124,6 @@
 							<!-- Package format version - do not change -->
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
 							<Vaadin-License-Title>${Vaadin-License-Title}</Vaadin-License-Title>
-							<Vaadin-Widgetsets>org.vaadin.teemusa.sidemenu.WidgetSet</Vaadin-Widgetsets>
 						</manifestEntries>
 					</archive>
 				</configuration>

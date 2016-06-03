@@ -25,8 +25,8 @@ public class DemoUI extends SideMenuUI {
 
 	@Override
 	protected void init(VaadinRequest request) {
-	    addMenu("My Menu Entry", () -> {
-	        Notification.show("Here is my custom action for this menu item.");
-	      });
+		addMenu("My Menu Entry", () -> {
+			Notification.show("Here is my custom action for this menu item.");
+		});
 	}
 }
