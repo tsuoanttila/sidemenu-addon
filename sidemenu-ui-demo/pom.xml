@@ -6,7 +6,7 @@
 	<artifactId>sidemenu-ui-demo</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>SideMenuUI Add-on Demo</name>
+	<name>SideMenu UI Add-on Demo</name>
 
 	<prerequisites>
 		<maven>3</maven>

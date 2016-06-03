@@ -6,7 +6,7 @@
 	<artifactId>sidemenu-ui-root</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>SideMenuUI Add-on Root Project</name>
+	<name>SideMenu UI Add-on Root Project</name>
 
 	<prerequisites>
 		<maven>3</maven>

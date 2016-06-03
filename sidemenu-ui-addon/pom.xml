@@ -6,7 +6,7 @@
 	<artifactId>sidemenu-ui</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>SideMenuUI Add-on</name>
+	<name>SideMenu UI Add-on</name>
 
 	<prerequisites>
 		<maven>3</maven>
