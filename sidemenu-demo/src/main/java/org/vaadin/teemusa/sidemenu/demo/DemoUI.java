@@ -22,7 +22,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @Theme("demo")
-@Title("SideMenuUI Add-on Demo")
+@Title("SideMenu Add-on Demo")
 @SideMenuUI
 public class DemoUI extends UI {
 
