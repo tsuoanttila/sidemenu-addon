@@ -1,17 +1,20 @@
-# SideMenu UI Add-on for Vaadin
+# SideMenu Add-on for Vaadin
 
-This is a simple extension on top of default Vaadin UI
-which adds a Valo themed menu to the left side of the page.
+This is a simple Vaadin component that allows the user to make
+side menus like in http://demo.vaadin.com/dashboard easily.
 
 Usage:
 ```
-public class MyUI extends SideMenuUI {
+public class MyUI extends UI {
 
   @Override
   public void init(VaadinRequest request) {
-    addMenu("My Menu Entry", () -> {
+    SideMenu menu = new SideMenu();
+    menu.setMenuCaption("MyUI Menu");
+    menu.addMenuItem("My Menu Entry", () -> {
       Notification.show("Here is my custom action for this menu item.");
     });
+    setContent(menu);
   }
 }
 ```
