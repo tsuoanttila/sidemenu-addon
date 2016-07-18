@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.vaadin.teemusa</groupId>
-	<artifactId>sidemenu-ui-demo</artifactId>
+	<artifactId>sidemenu-demo</artifactId>
 	<packaging>war</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>SideMenu UI Add-on Demo</name>
+	<name>SideMenu Add-on Demo</name>
 
 	<prerequisites>
 		<maven>3</maven>
@@ -20,25 +20,6 @@
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 	</properties>
-
-    <!--     
-	<organization>
-		<name>My Name</name>
-		<url>https://github.com/mygithubaccount/SideMenuUI/</url>
-	</organization>
-    
-	<scm>
-		<url>git://github.com/mygithubaccount/SideMenuUI.git</url>
-		<connection>scm:git:git://github.com/mygithubaccount/SideMenuUI.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:/mygithubaccount/${componentClassName}.git</developerConnection>
-		<tag>SideMenuUI add-on for Vaadin</tag>
-	</scm>
-
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/mygithubaccount/SideMenuUI/issues</url>
-	</issueManagement>
-    -->
 
 	<licenses>
 		<license>
@@ -93,7 +74,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.vaadin.teemusa</groupId>
-			<artifactId>sidemenu-ui</artifactId>
+			<artifactId>sidemenu</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

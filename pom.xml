@@ -3,18 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.vaadin.teemusa</groupId>
-	<artifactId>sidemenu-ui-root</artifactId>
+	<artifactId>sidemenu-root</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>SideMenu UI Add-on Root Project</name>
+	<name>SideMenu Add-on Root Project</name>
 
 	<prerequisites>
 		<maven>3</maven>
 	</prerequisites>
 
 	<modules>
-		<module>sidemenu-ui-addon</module>
-		<module>sidemenu-ui-demo</module>
+		<module>sidemenu-addon</module>
+		<module>sidemenu-demo</module>
 	</modules>
 
 	<profiles>
