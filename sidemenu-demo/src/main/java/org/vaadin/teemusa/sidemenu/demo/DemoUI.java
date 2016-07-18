@@ -70,6 +70,11 @@ public class DemoUI extends UI {
 			sideMenu.setContent(content);
 		});
 
+		// User menu controls
+		sideMenu.addMenuItem("Show/Hide user menu", FontAwesome.USER, () -> {
+			sideMenu.setUserMenuVisible(!sideMenu.isUserMenuVisible());
+		});
+
 		setUser("Guest", FontAwesome.MALE);
 	}
 

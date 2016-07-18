@@ -213,6 +213,26 @@ public class SideMenu extends HorizontalLayout {
 	}
 
 	/**
+	 * Sets the visibility of the whole user menu. This includes portrait, user
+	 * name and the drop down menu.
+	 * 
+	 * @param visible
+	 *            user menu visibility
+	 */
+	public void setUserMenuVisible(boolean visible) {
+		userMenu.setVisible(visible);
+	}
+
+	/**
+	 * Gets the visibility of the user menu.
+	 * 
+	 * @return {@code true} if visible; {@code false} if hidden
+	 */
+	public boolean isUserMenuVisible() {
+		return userMenu.isVisible();
+	}
+
+	/**
 	 * Sets the title text for the menu
 	 * 
 	 * @param caption
