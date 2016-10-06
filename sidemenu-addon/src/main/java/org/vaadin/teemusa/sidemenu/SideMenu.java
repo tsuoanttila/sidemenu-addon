@@ -61,7 +61,7 @@ public class SideMenu extends HorizontalLayout {
 	private MenuItem userItem;
 
 	/* Caption component for the whole menu */
-	HorizontalLayout logoWrapper;
+	private HorizontalLayout logoWrapper;
 	private Label menuCaption;
 	private Image menuImage;
 
@@ -249,10 +249,14 @@ public class SideMenu extends HorizontalLayout {
 	 * Sets the title text for the menu
 	 * 
 	 * @param caption
-	 *            menu title
+	 *            menu image caption
+	 * @param source
+	 *            menu image source
 	 */
 	public void setMenuImage(String caption, Resource source) {
-		if (menuImage != null)logoWrapper.removeComponent(menuImage);
+		if (menuImage != null) {
+			logoWrapper.removeComponent(menuImage);
+		}
 		menuImage = new Image(caption,source);
 		logoWrapper.addComponent(menuImage);
 	}
