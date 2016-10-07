@@ -13,6 +13,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Label;
@@ -52,7 +53,8 @@ public class DemoUI extends UI {
 		navigator.addView("", new FooView("Initial view"));
 		navigator.addView("Foo", new FooView("Foo!"));
 
-		sideMenu.setMenuCaption("My App Menu");
+		sideMenu.setMenuCaption(null);
+		sideMenu.setMenuImage(null,  new ThemeResource("images/linux-penguin.png"));
 
 		// Navigation examples
 		sideMenu.addNavigation("Initial View", "");

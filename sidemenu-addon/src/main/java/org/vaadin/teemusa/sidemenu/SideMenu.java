@@ -13,6 +13,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
@@ -60,7 +61,9 @@ public class SideMenu extends HorizontalLayout {
 	private MenuItem userItem;
 
 	/* Caption component for the whole menu */
+	private HorizontalLayout logoWrapper;
 	private Label menuCaption;
+	private Image menuImage;
 
 	/**
 	 * Constructor for creating a SideMenu component. This method sets up all
@@ -80,10 +83,10 @@ public class SideMenu extends HorizontalLayout {
 		menuArea.addStyleName("no-horizontal-drag-hints");
 		menuArea.setWidth(null);
 		menuArea.setHeight("100%");
-
+		
 		menuCaption = new Label("Menu", ContentMode.HTML);
 		menuCaption.setSizeUndefined();
-		HorizontalLayout logoWrapper = new HorizontalLayout(menuCaption);
+		logoWrapper = new HorizontalLayout(menuCaption);
 		logoWrapper.setComponentAlignment(menuCaption, Alignment.MIDDLE_CENTER);
 		logoWrapper.addStyleName("valo-menu-title");
 		menuArea.addComponent(logoWrapper);
@@ -240,6 +243,22 @@ public class SideMenu extends HorizontalLayout {
 	 */
 	public void setMenuCaption(String caption) {
 		menuCaption.setValue(caption);
+	}
+
+	/**
+	 * Sets the title text for the menu
+	 * 
+	 * @param caption
+	 *            menu image caption
+	 * @param source
+	 *            menu image source
+	 */
+	public void setMenuImage(String caption, Resource source) {
+		if (menuImage != null) {
+			logoWrapper.removeComponent(menuImage);
+		}
+		menuImage = new Image(caption,source);
+		logoWrapper.addComponent(menuImage);
 	}
 
 	/**
