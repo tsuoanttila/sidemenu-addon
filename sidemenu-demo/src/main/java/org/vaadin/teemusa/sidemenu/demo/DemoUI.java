@@ -43,7 +43,10 @@ public class DemoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 
-	SideMenu sideMenu = new SideMenu();
+	private SideMenu sideMenu = new SideMenu();
+	private boolean logoVisible = true;
+	private ThemeResource logo = new ThemeResource("images/linux-penguin.png");
+	private String menuCaption = "SideMenu Add-on";
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -53,8 +56,7 @@ public class DemoUI extends UI {
 		navigator.addView("", new FooView("Initial view"));
 		navigator.addView("Foo", new FooView("Foo!"));
 
-		sideMenu.setMenuCaption(null);
-		sideMenu.setMenuImage(null,  new ThemeResource("images/linux-penguin.png"));
+		sideMenu.setMenuCaption(menuCaption, logo);
 
 		// Navigation examples
 		sideMenu.addNavigation("Initial View", "");
@@ -90,6 +92,15 @@ public class DemoUI extends UI {
 		});
 		sideMenu.addUserMenuItem("Sign out", () -> {
 			Notification.show("Logging out..", Type.TRAY_NOTIFICATION);
+		});
+
+		sideMenu.addUserMenuItem("Hide logo", () -> {
+			if (!logoVisible) {
+				sideMenu.setMenuCaption(menuCaption, logo);
+			} else {
+				sideMenu.setMenuCaption(menuCaption);
+			}
+			logoVisible = !logoVisible;
 		});
 	}
 }

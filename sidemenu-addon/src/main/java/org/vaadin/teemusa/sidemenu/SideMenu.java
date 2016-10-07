@@ -62,7 +62,6 @@ public class SideMenu extends HorizontalLayout {
 
 	/* Caption component for the whole menu */
 	private HorizontalLayout logoWrapper;
-	private Label menuCaption;
 	private Image menuImage;
 
 	/**
@@ -83,11 +82,8 @@ public class SideMenu extends HorizontalLayout {
 		menuArea.addStyleName("no-horizontal-drag-hints");
 		menuArea.setWidth(null);
 		menuArea.setHeight("100%");
-		
-		menuCaption = new Label("Menu", ContentMode.HTML);
-		menuCaption.setSizeUndefined();
-		logoWrapper = new HorizontalLayout(menuCaption);
-		logoWrapper.setComponentAlignment(menuCaption, Alignment.MIDDLE_CENTER);
+
+		logoWrapper = new HorizontalLayout();
 		logoWrapper.addStyleName("valo-menu-title");
 		menuArea.addComponent(logoWrapper);
 
@@ -242,22 +238,23 @@ public class SideMenu extends HorizontalLayout {
 	 *            menu title
 	 */
 	public void setMenuCaption(String caption) {
-		menuCaption.setValue(caption);
+		setMenuCaption(caption, null);
 	}
 
 	/**
-	 * Sets the title text for the menu
+	 * Sets the title caption and logo for the menu
 	 * 
 	 * @param caption
-	 *            menu image caption
-	 * @param source
-	 *            menu image source
+	 *            menu caption
+	 * @param logo
+	 *            menu logo
 	 */
-	public void setMenuImage(String caption, Resource source) {
+	public void setMenuCaption(String caption, Resource source) {
 		if (menuImage != null) {
 			logoWrapper.removeComponent(menuImage);
 		}
-		menuImage = new Image(caption,source);
+		menuImage = new Image(caption, source);
+		menuImage.setWidth("100%");
 		logoWrapper.addComponent(menuImage);
 	}
 
