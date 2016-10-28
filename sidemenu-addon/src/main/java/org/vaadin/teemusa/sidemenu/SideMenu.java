@@ -249,11 +249,11 @@ public class SideMenu extends HorizontalLayout {
 	 * @param logo
 	 *            menu logo
 	 */
-	public void setMenuCaption(String caption, Resource source) {
+	public void setMenuCaption(String caption, Resource logo) {
 		if (menuImage != null) {
 			logoWrapper.removeComponent(menuImage);
 		}
-		menuImage = new Image(caption, source);
+		menuImage = new Image(caption, logo);
 		menuImage.setWidth("100%");
 		logoWrapper.addComponent(menuImage);
 	}
