@@ -40,6 +40,7 @@
 		</profile>
 	</profiles>
 
+	<!-- jetty-runner download for Heroku deployment -->
 	<build>
 		<plugins>
 			<plugin>
