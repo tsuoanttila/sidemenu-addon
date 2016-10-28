@@ -60,7 +60,7 @@ public class DemoUI extends UI {
 
 		// Navigation examples
 		sideMenu.addNavigation("Initial View", "");
-		sideMenu.addNavigation("Foo View", FontAwesome.AMBULANCE, "Foo");
+		sideMenu.addNavigation("Secondary View", FontAwesome.AMBULANCE, "Foo");
 
 		// Arbitrary method execution
 		sideMenu.addMenuItem("My Menu Entry", () -> {
