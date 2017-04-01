@@ -1,11 +1,9 @@
 package org.vaadin.teemusa.sidemenu;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -14,7 +12,6 @@ import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -102,7 +99,7 @@ public class SideMenu extends HorizontalLayout {
 				}
 			}
 		});
-		valoMenuToggleButton.setIcon(FontAwesome.LIST);
+		valoMenuToggleButton.setIcon(VaadinIcons.LIST);
 		valoMenuToggleButton.addStyleName("valo-menu-toggle");
 		valoMenuToggleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 		valoMenuToggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
