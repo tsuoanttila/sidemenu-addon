@@ -9,6 +9,7 @@ import org.vaadin.teemusa.sidemenu.SideMenuUI;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
@@ -27,7 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 
 @Theme("demo")
 @Title("SideMenu Add-on Demo")
-@SideMenuUI
+@Viewport("user-scalable=no,initial-scale=1.0")
 public class DemoUI extends UI {
 
 	private final class FooView extends VerticalLayout implements View {
@@ -61,6 +62,10 @@ public class DemoUI extends UI {
 		navigator.addView("", new FooView("Initial view"));
 		navigator.addView("Foo", new FooView("Foo!"));
 
+		// Since we're mixing both navigator and non-navigator menus the
+		// navigator state needs to be manually triggered.
+		navigator.navigateTo("");
+
 		sideMenu.setMenuCaption(menuCaption, logo);
 
 		// Navigation examples
@@ -73,11 +78,13 @@ public class DemoUI extends UI {
 			content.addComponent(new Label("A layout"));
 			sideMenu.setContent(content);
 		});
-		MenuRegistration menuWithIcon = sideMenu.addMenuItem("Entry With Icon", VaadinIcons.ACCESSIBILITY, () -> {
+		sideMenu.addMenuItem("Entry With Icon", VaadinIcons.ACCESSIBILITY, () -> {
 			VerticalLayout content = new VerticalLayout();
 			content.addComponent(new Label("Another layout"));
 			sideMenu.setContent(content);
-		});
+		})
+				// Navigator has done its own setup, any menu can be selected.
+				.select();
 
 		// User menu controls
 		sideMenu.addMenuItem("Show/Hide user menu", VaadinIcons.USER, () -> {
@@ -93,13 +100,6 @@ public class DemoUI extends UI {
 
 		setUser("Guest", VaadinIcons.MALE);
 
-		// Since we're mixing both navigator and non-navigator menus the
-		// navigator state needs to be manually triggered.
-		navigator.navigateTo("");
-
-		// Now that navigator has done its own setup, any menu item can be
-		// selected.
-		menuWithIcon.select();
 	}
 
 	private void setUser(String name, Resource icon) {
