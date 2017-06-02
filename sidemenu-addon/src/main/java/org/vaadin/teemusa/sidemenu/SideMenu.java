@@ -2,6 +2,7 @@ package org.vaadin.teemusa.sidemenu;
 
 import java.io.Serializable;
 
+import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
@@ -24,7 +25,8 @@ import com.vaadin.ui.themes.ValoTheme;
  * A helper component to make it easy to create menus like the one in the
  * quicktickets demo. The SideMenu should be the content of the UI, and all
  * other components should be handled through it. The UI should be annotated
- * with {@link SideMenuUI} to provide responsiveness.
+ * with {@code @Viewport("user-scalable=no,initial-scale=1.0")} to provide
+ * responsiveness on mobile devices.
  * <p>
  * This component has modification to allow it to be used easily with
  * {@link Navigator}. Pass it as a parameter to the constructor like
@@ -173,6 +175,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            menu text
 	 * @param handler
 	 *            menu click handler
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addMenuItem(String text, MenuClickHandler handler) {
 		return addMenuItem(text, null, handler);
@@ -188,6 +192,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            menu icon
 	 * @param handler
 	 *            menu click handler
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
 		Button button = new Button(text, new ClickListener() {
@@ -212,6 +218,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            menu text
 	 * @param handler
 	 *            menu click handler
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addUserMenuItem(String text, MenuClickHandler handler) {
 		return addUserMenuItem(text, null, handler);
@@ -227,6 +235,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            menu icon
 	 * @param handler
 	 *            menu click handler
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addUserMenuItem(String text, Resource icon, final MenuClickHandler handler) {
 		Command menuCommand = selectedItem -> handler.click();
@@ -315,6 +325,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            text to display in menu
 	 * @param navigationState
 	 *            state to navigate to
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addNavigation(String text, String navigationState) {
 		return addNavigation(text, null, navigationState);
@@ -329,6 +341,8 @@ public class SideMenu extends HorizontalLayout {
 	 *            icon to display in menu
 	 * @param navigationState
 	 *            state to navigate to
+	 * 
+	 * @return menu registration
 	 */
 	public MenuRegistration addNavigation(String text, Resource icon, final String navigationState) {
 		return addMenuItem(text, icon, () -> getUI().getNavigator().navigateTo(navigationState));
