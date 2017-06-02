@@ -8,6 +8,7 @@ import org.vaadin.teemusa.sidemenu.SideMenuUI;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -60,7 +61,7 @@ public class DemoUI extends UI {
 
 		// Navigation examples
 		sideMenu.addNavigation("Initial View", "");
-		sideMenu.addNavigation("Secondary View", FontAwesome.AMBULANCE, "Foo");
+		sideMenu.addNavigation("Secondary View", VaadinIcons.AMBULANCE, "Foo");
 
 		// Arbitrary method execution
 		sideMenu.addMenuItem("My Menu Entry", () -> {
@@ -75,7 +76,7 @@ public class DemoUI extends UI {
 		});
 
 		// User menu controls
-		sideMenu.addMenuItem("Show/Hide user menu", FontAwesome.USER, () -> {
+		sideMenu.addMenuItem("Show/Hide user menu", VaadinIcons.USER, () -> {
 			sideMenu.setUserMenuVisible(!sideMenu.isUserMenuVisible());
 		});
 
@@ -87,7 +88,7 @@ public class DemoUI extends UI {
 		sideMenu.setUserIcon(icon);
 
 		sideMenu.clearUserMenu();
-		sideMenu.addUserMenuItem("Settings", FontAwesome.WRENCH, () -> {
+		sideMenu.addUserMenuItem("Settings", VaadinIcons.WRENCH, () -> {
 			Notification.show("Showing settings", Type.TRAY_NOTIFICATION);
 		});
 		sideMenu.addUserMenuItem("Sign out", () -> {
