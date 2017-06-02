@@ -4,7 +4,6 @@ import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.teemusa.sidemenu.SideMenu;
 import org.vaadin.teemusa.sidemenu.SideMenu.MenuRegistration;
-import org.vaadin.teemusa.sidemenu.SideMenuUI;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -14,9 +13,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.server.SystemError;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -59,6 +56,10 @@ public class DemoUI extends UI {
 		setContent(sideMenu);
 		Navigator navigator = new Navigator(this, sideMenu);
 		setNavigator(navigator);
+
+		// NOTE: Navigation and custom code menus should not be mixed.
+		// See issue #8
+
 		navigator.addView("", new FooView("Initial view"));
 		navigator.addView("Foo", new FooView("Foo!"));
 
@@ -99,7 +100,6 @@ public class DemoUI extends UI {
 		});
 
 		setUser("Guest", VaadinIcons.MALE);
-
 	}
 
 	private void setUser(String name, Resource icon) {
