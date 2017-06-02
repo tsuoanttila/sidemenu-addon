@@ -1,14 +1,16 @@
 package org.vaadin.teemusa.sidemenu;
 
+import java.io.Serializable;
+
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.SerializableConsumer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
@@ -37,7 +39,7 @@ public class SideMenu extends HorizontalLayout {
 	 * A simple lambda compatible handler class for executing code when a menu
 	 * entry is clicked.
 	 */
-	public interface MenuClickHandler {
+	public interface MenuClickHandler extends Serializable {
 
 		/**
 		 * This method is called when associated menu entry is clicked.
@@ -45,11 +47,53 @@ public class SideMenu extends HorizontalLayout {
 		void click();
 	}
 
+	/**
+	 * Interface to provide operations to existing menu items.
+	 * 
+	 * @since 2.0
+	 */
+	public interface MenuRegistration extends Serializable {
+
+		/**
+		 * Select the menu object associated with this registration.
+		 */
+		void select();
+
+		/**
+		 * Removes the menu object associated with this registration.
+		 */
+		void remove();
+	}
+
+	private final class MenuRegistrationImpl<T> implements MenuRegistration {
+
+		private SerializableConsumer<T> selectMethod;
+		private SerializableConsumer<T> removeMethod;
+		private T menuItem;
+
+		public MenuRegistrationImpl(T menuItem, SerializableConsumer<T> selectMethod,
+				SerializableConsumer<T> removeMethod) {
+			this.menuItem = menuItem;
+			this.selectMethod = selectMethod;
+			this.removeMethod = removeMethod;
+		}
+
+		@Override
+		public void select() {
+			selectMethod.accept(menuItem);
+		}
+
+		@Override
+		public void remove() {
+			removeMethod.accept(menuItem);
+		}
+	}
+
 	/* Class name for hiding the menu when screen is too small */
 	private static final String STYLE_VISIBLE = "valo-menu-visible";
 
 	/* Components to handle content and menus */
-	private final ComponentContainer contentArea = new VerticalLayout();
+	private final VerticalLayout contentArea = new VerticalLayout();
 	private final CssLayout menuArea = new CssLayout();
 	private final CssLayout menuItemsLayout = new CssLayout();
 	private final MenuBar userMenu = new MenuBar();
@@ -112,6 +156,10 @@ public class SideMenu extends HorizontalLayout {
 		contentArea.addStyleName("v-scrollable");
 		contentArea.setSizeFull();
 
+		// Remove default margins and spacings
+		contentArea.setMargin(false);
+		contentArea.setSpacing(false);
+
 		super.addComponent(menuArea);
 		super.addComponent(contentArea);
 		setExpandRatio(contentArea, 1);
@@ -126,8 +174,8 @@ public class SideMenu extends HorizontalLayout {
 	 * @param handler
 	 *            menu click handler
 	 */
-	public void addMenuItem(String text, MenuClickHandler handler) {
-		addMenuItem(text, null, handler);
+	public MenuRegistration addMenuItem(String text, MenuClickHandler handler) {
+		return addMenuItem(text, null, handler);
 	}
 
 	/**
@@ -141,7 +189,7 @@ public class SideMenu extends HorizontalLayout {
 	 * @param handler
 	 *            menu click handler
 	 */
-	public void addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
+	public MenuRegistration addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
 		Button button = new Button(text, new ClickListener() {
 
 			@Override
@@ -153,6 +201,7 @@ public class SideMenu extends HorizontalLayout {
 		button.setIcon(icon);
 		button.setPrimaryStyleName("valo-menu-item");
 		menuItemsLayout.addComponent(button);
+		return new MenuRegistrationImpl<>(button, b -> b.click(), menuItemsLayout::removeComponent);
 	}
 
 	/**
@@ -164,8 +213,8 @@ public class SideMenu extends HorizontalLayout {
 	 * @param handler
 	 *            menu click handler
 	 */
-	public void addUserMenuItem(String text, MenuClickHandler handler) {
-		addUserMenuItem(text, null, handler);
+	public MenuRegistration addUserMenuItem(String text, MenuClickHandler handler) {
+		return addUserMenuItem(text, null, handler);
 	}
 
 	/**
@@ -179,13 +228,10 @@ public class SideMenu extends HorizontalLayout {
 	 * @param handler
 	 *            menu click handler
 	 */
-	public void addUserMenuItem(String text, Resource icon, final MenuClickHandler handler) {
-		userItem.addItem(text, icon, new Command() {
-			@Override
-			public void menuSelected(MenuItem selectedItem) {
-				handler.click();
-			}
-		});
+	public MenuRegistration addUserMenuItem(String text, Resource icon, final MenuClickHandler handler) {
+		Command menuCommand = selectedItem -> handler.click();
+		MenuItem menuItem = userItem.addItem(text, icon, menuCommand);
+		return new MenuRegistrationImpl<>(menuItem, menuCommand::menuSelected, userItem::removeChild);
 	}
 
 	/**
@@ -270,8 +316,8 @@ public class SideMenu extends HorizontalLayout {
 	 * @param navigationState
 	 *            state to navigate to
 	 */
-	public void addNavigation(String text, String navigationState) {
-		addNavigation(text, null, navigationState);
+	public MenuRegistration addNavigation(String text, String navigationState) {
+		return addNavigation(text, null, navigationState);
 	}
 
 	/**
@@ -284,14 +330,8 @@ public class SideMenu extends HorizontalLayout {
 	 * @param navigationState
 	 *            state to navigate to
 	 */
-	public void addNavigation(String text, Resource icon, final String navigationState) {
-		addMenuItem(text, icon, new MenuClickHandler() {
-
-			@Override
-			public void click() {
-				getUI().getNavigator().navigateTo(navigationState);
-			}
-		});
+	public MenuRegistration addNavigation(String text, Resource icon, final String navigationState) {
+		return addMenuItem(text, icon, () -> getUI().getNavigator().navigateTo(navigationState));
 	}
 
 	/**

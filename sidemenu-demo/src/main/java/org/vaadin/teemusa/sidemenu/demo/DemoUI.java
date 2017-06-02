@@ -3,6 +3,7 @@ package org.vaadin.teemusa.sidemenu.demo;
 import javax.servlet.annotation.WebServlet;
 
 import org.vaadin.teemusa.sidemenu.SideMenu;
+import org.vaadin.teemusa.sidemenu.SideMenu.MenuRegistration;
 import org.vaadin.teemusa.sidemenu.SideMenuUI;
 
 import com.vaadin.annotations.Theme;
@@ -14,6 +15,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.server.SystemError;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -49,6 +51,8 @@ public class DemoUI extends UI {
 	private ThemeResource logo = new ThemeResource("images/linux-penguin.png");
 	private String menuCaption = "SideMenu Add-on";
 
+	private MenuRegistration menuToRemove;
+
 	@Override
 	protected void init(VaadinRequest request) {
 		setContent(sideMenu);
@@ -69,7 +73,7 @@ public class DemoUI extends UI {
 			content.addComponent(new Label("A layout"));
 			sideMenu.setContent(content);
 		});
-		sideMenu.addMenuItem("Entry With Icon", FontAwesome.ANDROID, () -> {
+		MenuRegistration menuWithIcon = sideMenu.addMenuItem("Entry With Icon", VaadinIcons.ACCESSIBILITY, () -> {
 			VerticalLayout content = new VerticalLayout();
 			content.addComponent(new Label("Another layout"));
 			sideMenu.setContent(content);
@@ -80,7 +84,22 @@ public class DemoUI extends UI {
 			sideMenu.setUserMenuVisible(!sideMenu.isUserMenuVisible());
 		});
 
-		setUser("Guest", FontAwesome.MALE);
+		menuToRemove = sideMenu.addMenuItem("Remove this menu item", () -> {
+			if (menuToRemove != null) {
+				menuToRemove.remove();
+				menuToRemove = null;
+			}
+		});
+
+		setUser("Guest", VaadinIcons.MALE);
+
+		// Since we're mixing both navigator and non-navigator menus the
+		// navigator state needs to be manually triggered.
+		navigator.navigateTo("");
+
+		// Now that navigator has done its own setup, any menu item can be
+		// selected.
+		menuWithIcon.select();
 	}
 
 	private void setUser(String name, Resource icon) {
