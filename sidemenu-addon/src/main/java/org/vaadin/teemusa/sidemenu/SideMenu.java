@@ -1,8 +1,5 @@
 package org.vaadin.teemusa.sidemenu;
 
-import java.io.Serializable;
-
-import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
@@ -20,6 +17,8 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import java.io.Serializable;
 
 /**
  * A helper component to make it easy to create menus like the one in the
@@ -113,7 +112,7 @@ public class SideMenu extends HorizontalLayout {
 	 */
 	public SideMenu() {
 		super();
-
+		setSpacing(false);
 		addStyleName(ValoTheme.UI_WITH_MENU);
 		Responsive.makeResponsive(this);
 		setSizeFull();
