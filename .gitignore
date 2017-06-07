@@ -17,3 +17,4 @@ target/
 
 # Global
 overlays/
+**/styles.scss.cache
