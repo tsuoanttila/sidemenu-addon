@@ -1,5 +1,20 @@
+# Eclipse
+.classpath
 .project
 .settings/
-.classpath
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
 target/
+
+# Global
+overlays/
 **/styles.scss.cache

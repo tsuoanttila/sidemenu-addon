@@ -1,8 +1,5 @@
 package org.vaadin.teemusa.sidemenu;
 
-import java.io.Serializable;
-
-import com.vaadin.annotations.Viewport;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
@@ -21,6 +18,8 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import java.io.Serializable;
+
 /**
  * A helper component to make it easy to create menus like the one in the
  * quicktickets demo. The SideMenu should be the content of the UI, and all
@@ -31,7 +30,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * This component has modification to allow it to be used easily with
  * {@link Navigator}. Pass it as a parameter to the constructor like
  * {@code new Navigator(myUI, sideMenu)}.
- * 
+ *
  * @author Teemu Suo-Anttila
  */
 @SuppressWarnings("serial")
@@ -51,7 +50,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Interface to provide operations to existing menu items.
-	 * 
+	 *
 	 * @since 2.0
 	 */
 	public interface MenuRegistration extends Serializable {
@@ -113,7 +112,7 @@ public class SideMenu extends HorizontalLayout {
 	 */
 	public SideMenu() {
 		super();
-
+		setSpacing(false);
 		addStyleName(ValoTheme.UI_WITH_MENU);
 		Responsive.makeResponsive(this);
 		setSizeFull();
@@ -170,12 +169,12 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Adds a menu entry. The given handler is called when the user clicks the
 	 * entry.
-	 * 
+	 *
 	 * @param text
 	 *            menu text
 	 * @param handler
 	 *            menu click handler
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addMenuItem(String text, MenuClickHandler handler) {
@@ -185,14 +184,14 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Adds a menu entry with given icon. The given handler is called when the
 	 * user clicks the entry.
-	 * 
+	 *
 	 * @param text
 	 *            menu text
 	 * @param icon
 	 *            menu icon
 	 * @param handler
 	 *            menu click handler
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
@@ -213,12 +212,12 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Adds a menu entry to the user drop down menu. The given handler is called
 	 * when the user clicks the entry.
-	 * 
+	 *
 	 * @param text
 	 *            menu text
 	 * @param handler
 	 *            menu click handler
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addUserMenuItem(String text, MenuClickHandler handler) {
@@ -228,14 +227,14 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Adds a menu entry to the user drop down menu with given icon. The given
 	 * handler is called when the user clicks the entry.
-	 * 
+	 *
 	 * @param text
 	 *            menu text
 	 * @param icon
 	 *            menu icon
 	 * @param handler
 	 *            menu click handler
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addUserMenuItem(String text, Resource icon, final MenuClickHandler handler) {
@@ -246,7 +245,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Sets the user name to be displayed in the menu.
-	 * 
+	 *
 	 * @param userName
 	 *            user name
 	 */
@@ -256,7 +255,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Sets the portrait of the user to be displayed in the menu.
-	 * 
+	 *
 	 * @param icon
 	 *            portrait of the user
 	 */
@@ -267,7 +266,7 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Sets the visibility of the whole user menu. This includes portrait, user
 	 * name and the drop down menu.
-	 * 
+	 *
 	 * @param visible
 	 *            user menu visibility
 	 */
@@ -277,7 +276,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Gets the visibility of the user menu.
-	 * 
+	 *
 	 * @return {@code true} if visible; {@code false} if hidden
 	 */
 	public boolean isUserMenuVisible() {
@@ -286,7 +285,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Sets the title text for the menu
-	 * 
+	 *
 	 * @param caption
 	 *            menu title
 	 */
@@ -296,7 +295,7 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Sets the title caption and logo for the menu
-	 * 
+	 *
 	 * @param caption
 	 *            menu caption
 	 * @param logo
@@ -320,12 +319,12 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Adds a menu entry to navigate to given navigation state.
-	 * 
+	 *
 	 * @param text
 	 *            text to display in menu
 	 * @param navigationState
 	 *            state to navigate to
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addNavigation(String text, String navigationState) {
@@ -334,14 +333,14 @@ public class SideMenu extends HorizontalLayout {
 
 	/**
 	 * Adds a menu entry with given icon to navigate to given navigation state.
-	 * 
+	 *
 	 * @param text
 	 *            text to display in menu
 	 * @param icon
 	 *            icon to display in menu
 	 * @param navigationState
 	 *            state to navigate to
-	 * 
+	 *
 	 * @return menu registration
 	 */
 	public MenuRegistration addNavigation(String text, Resource icon, final String navigationState) {
@@ -367,7 +366,7 @@ public class SideMenu extends HorizontalLayout {
 	/**
 	 * Removes all content from the content area and replaces everything with
 	 * given component.
-	 * 
+	 *
 	 * @param content
 	 *            new content to display
 	 */
