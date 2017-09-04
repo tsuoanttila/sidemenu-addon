@@ -316,6 +316,13 @@ public class SideMenu extends HorizontalLayout {
 	public void clearUserMenu() {
 		userItem.removeChildren();
 	}
+	
+	/**
+	 * Removes all content from the navigation menu.
+	 */
+	public void clearMenu() {
+		menuItemsLayout.removeAllComponents();
+	}
 
 	/**
 	 * Adds a menu entry to navigate to given navigation state.
