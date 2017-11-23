@@ -10,7 +10,7 @@ pipeline {
     }
 
     stages {
-        stage('test') {
+        stage('build') {
             steps {
                 script {
                     sh "mvn clean deploy -Dmaven.test.failure.ignore=true -e -B"
