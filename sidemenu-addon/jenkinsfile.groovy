@@ -12,9 +12,11 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                script {
-                    sh "mvn clean deploy -Dmaven.test.failure.ignore=true -e -B"
-                    junit "**/target/surefire-reports/**/*.xml"
+                dir("sidemenu-addon") {
+                    script {
+                        sh "mvn clean deploy -Dmaven.test.failure.ignore=true -e -B"
+                        junit "**/target/surefire-reports/**/*.xml"
+                    }
                 }
             }
         }
