@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                dir("sidemenu-addon") {
-                    script {
+                script {
+                    dir("sidemenu-addon") {
                         sh "mvn clean deploy -Dmaven.test.failure.ignore=true -e -B"
                         junit "**/target/surefire-reports/**/*.xml"
                     }
