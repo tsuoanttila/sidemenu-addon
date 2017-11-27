@@ -21,11 +21,29 @@ public class SideMenuTest {
     }
 
     @Test
-    public void addTreeItemSubnotUserOriginated() {
+    public void addTreeItemSubNotUserOriginated() {
         SideMenu sideMenu = new SideMenu();
         sideMenu.addTreeItem("parent", null);
         SideMenu.MenuRegistration item = sideMenu.addTreeItem("parent", "item", clickHandler);
         item.select();
         verifyZeroInteractions(clickHandler);
+    }
+
+    @Test
+    public void addTreeItemRootRepeat() {
+        SideMenu sideMenu = new SideMenu();
+        sideMenu.addTreeItem("item", clickHandler);
+        sideMenu.addTreeItem("item", clickHandler);
+        // expect no exception
+    }
+
+    @Test
+    public void addTreeItemSubRepeat() {
+        SideMenu sideMenu = new SideMenu();
+        sideMenu.addTreeItem("parent1", clickHandler);
+        sideMenu.addTreeItem("parent1", "item", clickHandler);
+        sideMenu.addTreeItem("parent2", clickHandler);
+        sideMenu.addTreeItem("parent2", "item", clickHandler);
+        // expect no exception
     }
 }

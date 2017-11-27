@@ -106,6 +106,7 @@ public class SideMenu extends HorizontalLayout {
     private final Tree<String> treeMenu = new Tree<>();
     private final TreeData<String> treeMenuData = new TreeData<>();
     private final Map<String, MenuClickHandler> treeMenuItemToClick = new HashMap<>();
+    private final Map<String, MenuRegistration> treeMenuItemToRegistration = new HashMap<>();
 
     /* Quick access to user drop down menu */
     private MenuItem userItem;
@@ -225,20 +226,24 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-     * Add a root tree item to the menu
+     * Add a root tree item to the menu. If it already exists, nothing happens and the corresponding {@link MenuRegistration} is returned
      *
-     * @param treeItem caption of the root item, must be unique among all items incl. root/sub items
+     * @param rootItem caption of the root item, must be unique among all items incl. root/sub items
      * @param clickHandler triggered if the specified item is selected
      * @return MenuRegistration of the added item
      */
-    public MenuRegistration addTreeItem(String treeItem, MenuClickHandler clickHandler) {
+    public MenuRegistration addTreeItem(String rootItem, MenuClickHandler clickHandler) {
         ensureTreeAdded();
-        treeMenuData.addRootItems(treeItem);
-        return registerTreeMenuItem(treeItem, clickHandler);
+        MenuRegistration existingRegistration = treeMenuItemToRegistration.get(rootItem);
+        if (null != existingRegistration) {
+            return existingRegistration;
+        }
+        treeMenuData.addRootItems(rootItem);
+        return registerTreeMenuItem(rootItem, clickHandler);
     }
 
     /**
-     * Add a sub tree item to the menu
+     * Add a sub tree item to the menu. If it already exists, nothing happens and the corresponding {@link MenuRegistration} is returned
      *
      * @param parent caption of the parent item of the item to be added
      * @param item caption of the sub item, must be unique among all items incl. root/sub items
@@ -247,16 +252,25 @@ public class SideMenu extends HorizontalLayout {
      */
     public MenuRegistration addTreeItem(String parent, String item, MenuClickHandler clickHandler) {
         ensureTreeAdded();
+        MenuRegistration existingRegistration = treeMenuItemToRegistration.get(item);
+        if (null != existingRegistration) {
+            return existingRegistration;
+        }
         treeMenuData.addItem(parent, item);
         return registerTreeMenuItem(item, clickHandler);
     }
 
     private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
         treeMenuItemToClick.put(treeItem, clickHandler);
-        return new MenuRegistrationImpl<>(treeItem, treeMenu::select, remove -> {
+        MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
+            treeMenu.expand(treeMenuData.getParent(item));
+            treeMenu.select(item);
+        }, remove -> {
             treeMenuData.removeItem(remove);
             treeMenuItemToClick.remove(remove);
         });
+        treeMenuItemToRegistration.put(treeItem, registration);
+        return registration;
     }
 
     private void ensureTreeAdded() {
