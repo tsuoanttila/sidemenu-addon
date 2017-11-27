@@ -263,8 +263,9 @@ public class SideMenu extends HorizontalLayout {
     private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
         treeMenuItemToClick.put(treeItem, clickHandler);
         MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
-            treeMenu.expand(treeMenuData.getParent(item));
-            treeMenu.expand(item);
+            for (String parent = item; null != parent; parent = treeMenuData.getParent(parent)) {
+                treeMenu.expand(parent);
+            }
             treeMenu.select(item);
         }, remove -> {
             treeMenuData.removeItem(remove);
