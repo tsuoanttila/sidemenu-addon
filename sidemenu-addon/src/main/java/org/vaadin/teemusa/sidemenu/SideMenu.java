@@ -102,7 +102,6 @@ public class SideMenu extends HorizontalLayout {
     private final CssLayout menuArea = new CssLayout();
     private final CssLayout menuItemsLayout = new CssLayout();
     private final MenuBar userMenu = new MenuBar();
-    private final Tree<String> treeMenu = new Tree<>();
 
     private final Tree<String> treeMenu = new Tree<>();
     private final TreeData<String> treeMenuData = new TreeData<>();
