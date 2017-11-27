@@ -1,12 +1,17 @@
 package org.vaadin.teemusa.sidemenu;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import com.vaadin.data.TreeData;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.SerializableConsumer;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -15,10 +20,9 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
-import java.io.Serializable;
 
 /**
  * A helper component to make it easy to create menus like the one in the
@@ -99,6 +103,9 @@ public class SideMenu extends HorizontalLayout {
 	private final CssLayout menuItemsLayout = new CssLayout();
 	private final MenuBar userMenu = new MenuBar();
 
+    private final TreeData<String> treeMenuData = new TreeData<>();
+    private final Map<String, MenuClickHandler> treeMenuItemToClick = new HashMap<>();
+
 	/* Quick access to user drop down menu */
 	private MenuItem userItem;
 
@@ -134,16 +141,13 @@ public class SideMenu extends HorizontalLayout {
 
 		menuArea.addComponent(userMenu);
 
-		Button valoMenuToggleButton = new Button("Menu", new ClickListener() {
-			@Override
-			public void buttonClick(final ClickEvent event) {
-				if (menuArea.getStyleName().contains(STYLE_VISIBLE)) {
-					menuArea.removeStyleName(STYLE_VISIBLE);
-				} else {
-					menuArea.addStyleName(STYLE_VISIBLE);
-				}
-			}
-		});
+        Button valoMenuToggleButton = new Button("Menu", (ClickListener) event -> {
+            if (menuArea.getStyleName().contains(STYLE_VISIBLE)) {
+                menuArea.removeStyleName(STYLE_VISIBLE);
+            } else {
+                menuArea.addStyleName(STYLE_VISIBLE);
+            }
+        });
 		valoMenuToggleButton.setIcon(VaadinIcons.LIST);
 		valoMenuToggleButton.addStyleName("valo-menu-toggle");
 		valoMenuToggleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
@@ -151,6 +155,12 @@ public class SideMenu extends HorizontalLayout {
 		menuArea.addComponent(valoMenuToggleButton);
 
 		menuItemsLayout.addStyleName("valo-menuitems");
+        Tree<String> treeMenu = new Tree<>();
+        treeMenu.setTreeData(treeMenuData);
+        treeMenu.asSingleSelect().addValueChangeListener(
+            event -> Optional.ofNullable(event.getValue()).ifPresent(
+                selected -> Optional.ofNullable(treeMenuItemToClick.get(selected)).ifPresent(MenuClickHandler::click)));
+        menuItemsLayout.addComponent(treeMenu);
 		menuArea.addComponent(menuItemsLayout);
 
 		contentArea.setPrimaryStyleName("valo-content");
@@ -195,19 +205,25 @@ public class SideMenu extends HorizontalLayout {
 	 * @return menu registration
 	 */
 	public MenuRegistration addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
-		Button button = new Button(text, new ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				handler.click();
-				menuArea.removeStyleName(STYLE_VISIBLE);
-			}
-		});
+        Button button = new Button(text, (ClickListener) event -> {
+            handler.click();
+            menuArea.removeStyleName(STYLE_VISIBLE);
+        });
 		button.setIcon(icon);
 		button.setPrimaryStyleName("valo-menu-item");
 		menuItemsLayout.addComponent(button);
-		return new MenuRegistrationImpl<>(button, b -> b.click(), menuItemsLayout::removeComponent);
+        return new MenuRegistrationImpl<>(button, Button::click, menuItemsLayout::removeComponent);
 	}
+
+    public void addTreeItem(String treeItem, MenuClickHandler clickHandler) {
+        treeMenuData.addRootItems(treeItem);
+        treeMenuItemToClick.put(treeItem, clickHandler);
+    }
+
+    public void addTreeItem(String parent, String item, MenuClickHandler clickHandler) {
+        treeMenuData.addItem(parent, item);
+        treeMenuItemToClick.put(item, clickHandler);
+    }
 
 	/**
 	 * Adds a menu entry to the user drop down menu. The given handler is called

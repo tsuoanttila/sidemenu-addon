@@ -88,9 +88,7 @@ public class DemoUI extends UI {
 				.select();
 
 		// User menu controls
-		sideMenu.addMenuItem("Show/Hide user menu", VaadinIcons.USER, () -> {
-			sideMenu.setUserMenuVisible(!sideMenu.isUserMenuVisible());
-		});
+        sideMenu.addMenuItem("Show/Hide user menu", VaadinIcons.USER, () -> sideMenu.setUserMenuVisible( !sideMenu.isUserMenuVisible()));
 
 		menuToRemove = sideMenu.addMenuItem("Remove this menu item", () -> {
 			if (menuToRemove != null) {
@@ -99,20 +97,23 @@ public class DemoUI extends UI {
 			}
 		});
 
+        initTreeMenu();
+
 		setUser("Guest", VaadinIcons.MALE);
 	}
 
-	private void setUser(String name, Resource icon) {
+    private void initTreeMenu() {
+        sideMenu.addTreeItem("Tree item", () -> Notification.show("Parent!"));
+        sideMenu.addTreeItem("Tree item", "sub item", () -> Notification.show("Sub item!"));
+    }
+
+    private void setUser(String name, Resource icon) {
 		sideMenu.setUserName(name);
 		sideMenu.setUserIcon(icon);
 
 		sideMenu.clearUserMenu();
-		sideMenu.addUserMenuItem("Settings", VaadinIcons.WRENCH, () -> {
-			Notification.show("Showing settings", Type.TRAY_NOTIFICATION);
-		});
-		sideMenu.addUserMenuItem("Sign out", () -> {
-			Notification.show("Logging out..", Type.TRAY_NOTIFICATION);
-		});
+        sideMenu.addUserMenuItem("Settings", VaadinIcons.WRENCH, () -> Notification.show("Showing settings", Type.TRAY_NOTIFICATION));
+        sideMenu.addUserMenuItem("Sign out", () -> Notification.show("Logging out..", Type.TRAY_NOTIFICATION));
 
 		sideMenu.addUserMenuItem("Hide logo", () -> {
 			if (!logoVisible) {
