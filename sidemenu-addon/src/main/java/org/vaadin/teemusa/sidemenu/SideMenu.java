@@ -60,7 +60,7 @@ public class SideMenu extends HorizontalLayout {
     public interface MenuRegistration extends Serializable {
 
         /**
-         * Select the menu object associated with this registration.
+         * Select the menu object associated with this registration. If it's a tree menu item, it'll also be expanded w/ children items
          */
         void select();
 
@@ -264,6 +264,7 @@ public class SideMenu extends HorizontalLayout {
         treeMenuItemToClick.put(treeItem, clickHandler);
         MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
             treeMenu.expand(treeMenuData.getParent(item));
+            treeMenu.expand(item);
             treeMenu.select(item);
         }, remove -> {
             treeMenuData.removeItem(remove);
