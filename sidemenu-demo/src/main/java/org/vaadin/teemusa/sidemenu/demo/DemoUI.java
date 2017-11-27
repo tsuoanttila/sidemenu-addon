@@ -105,6 +105,7 @@ public class DemoUI extends UI {
     private void initTreeMenu() {
         sideMenu.addTreeItem("Tree item", () -> Notification.show("Parent!"));
         sideMenu.addTreeItem("Tree item", "sub item", () -> Notification.show("Sub item!"));
+        sideMenu.addTreeItem("sub item", "sub sub item", () -> Notification.show("Inception!"));
     }
 
     private void setUser(String name, Resource icon) {
