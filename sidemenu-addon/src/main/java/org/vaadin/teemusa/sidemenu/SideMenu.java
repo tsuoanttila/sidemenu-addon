@@ -103,6 +103,7 @@ public class SideMenu extends HorizontalLayout {
 	private final CssLayout menuItemsLayout = new CssLayout();
 	private final MenuBar userMenu = new MenuBar();
 
+    private final Tree<String> treeMenu = new Tree<>();
     private final TreeData<String> treeMenuData = new TreeData<>();
     private final Map<String, MenuClickHandler> treeMenuItemToClick = new HashMap<>();
 
@@ -155,11 +156,19 @@ public class SideMenu extends HorizontalLayout {
 		menuArea.addComponent(valoMenuToggleButton);
 
 		menuItemsLayout.addStyleName("valo-menuitems");
-        Tree<String> treeMenu = new Tree<>();
         treeMenu.setTreeData(treeMenuData);
         treeMenu.asSingleSelect().addValueChangeListener(
-            event -> Optional.ofNullable(event.getValue()).ifPresent(
-                selected -> Optional.ofNullable(treeMenuItemToClick.get(selected)).ifPresent(MenuClickHandler::click)));
+            event -> {
+                if ( !event.isUserOriginated()) {
+                    return;
+                }
+                if (null == event.getValue()) {
+                    // Workaround to disable deselect
+                    treeMenu.select(event.getOldValue());
+                } else {
+                    Optional.ofNullable(treeMenuItemToClick.get(event.getValue())).ifPresent(MenuClickHandler::click);
+                }
+            });
         menuItemsLayout.addComponent(treeMenu);
 		menuArea.addComponent(menuItemsLayout);
 
@@ -215,14 +224,37 @@ public class SideMenu extends HorizontalLayout {
         return new MenuRegistrationImpl<>(button, Button::click, menuItemsLayout::removeComponent);
 	}
 
-    public void addTreeItem(String treeItem, MenuClickHandler clickHandler) {
+    /**
+     * Add a root tree item to the menu
+     * 
+     * @param treeItem caption of the root item, must be unique among all items incl. root/sub items
+     * @param clickHandler triggered if the specified item is selected
+     * @return MenuRegistration of the added item
+     */
+    public MenuRegistration addTreeItem(String treeItem, MenuClickHandler clickHandler) {
         treeMenuData.addRootItems(treeItem);
-        treeMenuItemToClick.put(treeItem, clickHandler);
+        return registerTreeMenuItem(treeItem, clickHandler);
     }
 
-    public void addTreeItem(String parent, String item, MenuClickHandler clickHandler) {
+    /**
+     * Add a sub tree item to the menu
+     * 
+     * @param parent caption of the parent item of the item to be added
+     * @param item caption of the sub item, must be unique among all items incl. root/sub items
+     * @param clickHandler triggered if the specified item is selected
+     * @return MenuRegistration of the added item
+     */
+    public MenuRegistration addTreeItem(String parent, String item, MenuClickHandler clickHandler) {
         treeMenuData.addItem(parent, item);
-        treeMenuItemToClick.put(item, clickHandler);
+        return registerTreeMenuItem(item, clickHandler);
+    }
+
+    private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
+        treeMenuItemToClick.put(treeItem, clickHandler);
+        return new MenuRegistrationImpl<>(treeItem, treeMenu::select, remove -> {
+            treeMenuData.removeItem(remove);
+            treeMenuItemToClick.remove(remove);
+        });
     }
 
 	/**
