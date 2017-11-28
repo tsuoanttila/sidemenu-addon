@@ -3,6 +3,7 @@ package org.vaadin.teemusa.sidemenu;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.vaadin.data.TreeData;
@@ -226,7 +227,7 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-     * Add a root tree item to the menu. If it already exists, nothing happens and the corresponding {@link MenuRegistration} is returned
+     * Add a root tree item to the menu. If it already exists, nothing happens and the existing {@link MenuRegistration} is returned
      *
      * @param rootItem caption of the root item, must be unique among all items incl. root/sub items
      * @param clickHandler triggered if the specified item is selected
@@ -243,7 +244,7 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-     * Add a sub tree item to the menu. If it already exists, nothing happens and the corresponding {@link MenuRegistration} is returned
+     * Add a sub tree item to the menu. If it already exists, nothing happens and the existing {@link MenuRegistration} is returned
      *
      * @param parent caption of the parent item of the item to be added
      * @param item caption of the sub item, must be unique among all items incl. root/sub items
@@ -263,16 +264,26 @@ public class SideMenu extends HorizontalLayout {
     private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
         treeMenuItemToClick.put(treeItem, clickHandler);
         MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
+            // Tree "Bug": all parents must be explicitly expanded
             for (String parent = item; null != parent; parent = treeMenuData.getParent(parent)) {
                 treeMenu.expand(parent);
             }
             treeMenu.select(item);
         }, remove -> {
+            // Tree Bug: parent must be collapsed before remove, otherwise children of the removed item will stay
+            treeMenu.collapse(treeMenuData.getParent(remove));
+            removeRegistration(remove);
             treeMenuData.removeItem(remove);
             treeMenuItemToClick.remove(remove);
         });
         treeMenuItemToRegistration.put(treeItem, registration);
         return registration;
+    }
+
+    private void removeRegistration(String remove) {
+        treeMenuItemToRegistration.remove(remove);
+        treeMenuItemToClick.remove(remove);
+        treeMenuData.getChildren(remove).stream().filter(Objects::nonNull).forEach(this::removeRegistration);
     }
 
     private void ensureTreeAdded() {
