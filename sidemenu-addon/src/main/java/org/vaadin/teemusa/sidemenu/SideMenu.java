@@ -404,6 +404,7 @@ public class SideMenu extends HorizontalLayout {
      */
     public void clearMenu() {
         menuItemsLayout.removeAllComponents();
+        treeMenuData.clear();
     }
 
     /**
