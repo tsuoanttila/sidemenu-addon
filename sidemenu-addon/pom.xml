@@ -35,25 +35,11 @@
 	</organization>
 
 	<scm>
-		<url>git://github.com/OldIMP/sidemenu-addon.git</url>
-		<connection>scm:git:git://github.com/OldIMP/sidemenu-addon.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:/OldIMP/sidemenu-addon.git</developerConnection>
+        <url>git://github.com/tsuoanttila/sidemenu-addon.git</url>
+        <connection>scm:git:git://github.com/tsuoanttila/sidemenu-addon.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:/tsuoanttila/sidemenu-addon.git</developerConnection>
 		<tag>SideMenu add-on for Vaadin</tag>
 	</scm>
-
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>Nexus Releases</name>
-			<url>https://nexus.wrwks.at/repository/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>Nexus Snapshots</name>
-			<uniqueVersion>false</uniqueVersion>
-			<url>https://nexus.wrwks.at/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<issueManagement>
 		<system>GitHub</system>
