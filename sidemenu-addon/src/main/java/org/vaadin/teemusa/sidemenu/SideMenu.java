@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.vaadin.data.TreeData;
-import com.vaadin.data.provider.TreeDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
@@ -107,7 +106,6 @@ public class SideMenu extends HorizontalLayout {
 
     private final Tree<String> treeMenu = new Tree<>();
     private final TreeData<String> treeMenuData = new TreeData<>();
-    private final TreeDataProvider<String> treeMenuDataProvider = new TreeDataProvider<>(treeMenuData);
     private final Map<String, MenuClickHandler> treeMenuItemToClick = new HashMap<>();
     private final Map<String, MenuRegistration> treeMenuItemToRegistration = new HashMap<>();
 
@@ -161,7 +159,7 @@ public class SideMenu extends HorizontalLayout {
 
 		menuItemsLayout.addStyleName("valo-menuitems");
 
-        treeMenu.setDataProvider(treeMenuDataProvider);
+        treeMenu.setTreeData(treeMenuData);
         treeMenu.asSingleSelect().addValueChangeListener(event -> {
                 if ( !event.isUserOriginated()) {
                     return;
@@ -241,7 +239,6 @@ public class SideMenu extends HorizontalLayout {
             return existingRegistration;
         }
         treeMenuData.addRootItems(rootItem);
-        treeMenuDataProvider.refreshAll();
         return registerTreeMenuItem(rootItem, clickHandler);
     }
 
@@ -260,11 +257,11 @@ public class SideMenu extends HorizontalLayout {
             return existingRegistration;
         }
         treeMenuData.addItem(parent, item);
-        treeMenuDataProvider.refreshAll();
         return registerTreeMenuItem(item, clickHandler);
     }
 
     private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
+        treeMenu.getDataProvider().refreshAll();
         treeMenuItemToClick.put(treeItem, clickHandler);
         MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
             // Tree "Bug": all parents must be explicitly expanded
@@ -273,11 +270,9 @@ public class SideMenu extends HorizontalLayout {
             }
             treeMenu.select(item);
         }, remove -> {
-            // Tree Bug: parent must be collapsed before remove, otherwise children of the removed item will stay
-            treeMenu.collapse(treeMenuData.getParent(remove));
             removeRegistration(remove);
             treeMenuData.removeItem(remove);
-            treeMenuItemToClick.remove(remove);
+            treeMenu.getDataProvider().refreshAll();
         });
         treeMenuItemToRegistration.put(treeItem, registration);
         return registration;
@@ -405,6 +400,8 @@ public class SideMenu extends HorizontalLayout {
     public void clearMenu() {
         menuItemsLayout.removeAllComponents();
         treeMenuData.clear();
+        treeMenuItemToClick.clear();
+        treeMenuItemToRegistration.clear();
     }
 
     /**
