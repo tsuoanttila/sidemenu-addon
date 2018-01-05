@@ -15,7 +15,8 @@ public class SideMenuTest {
     @Test
     public void addTreeItemRootNotUserOriginated() {
         SideMenu sideMenu = new SideMenu();
-        SideMenu.MenuRegistration item = sideMenu.addTreeItem("item", clickHandler);
+        SideMenu.MenuRegistration item = sideMenu.addTreeItem("item",
+                clickHandler);
         item.select();
         verifyZeroInteractions(clickHandler);
     }
@@ -24,7 +25,8 @@ public class SideMenuTest {
     public void addTreeItemSubNotUserOriginated() {
         SideMenu sideMenu = new SideMenu();
         sideMenu.addTreeItem("parent", null);
-        SideMenu.MenuRegistration item = sideMenu.addTreeItem("parent", "item", clickHandler);
+        SideMenu.MenuRegistration item = sideMenu.addTreeItem("parent", "item",
+                clickHandler);
         item.select();
         verifyZeroInteractions(clickHandler);
     }
