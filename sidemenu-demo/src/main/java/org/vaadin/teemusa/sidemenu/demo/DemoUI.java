@@ -91,9 +91,14 @@ public class DemoUI extends UI {
                 .select();
 
         // User menu controls
-        sideMenu.addMenuItem("Show/Hide user menu", VaadinIcons.USER,
-                () -> sideMenu
-                        .setUserMenuVisible(!sideMenu.isUserMenuVisible()));
+        MenuRegistration userMenuToggle = sideMenu.addMenuItem("Hide user menu",
+                VaadinIcons.USER, null);
+        userMenuToggle.getMenuEntry().setClickHandler(() -> {
+            sideMenu.setUserMenuVisible(!sideMenu.isUserMenuVisible());
+            userMenuToggle.getMenuEntry().setMenuText(
+                    (sideMenu.isUserMenuVisible() ? "Hide" : "Show")
+                            + " user menu");
+        });
 
         menuToRemove = sideMenu.addMenuItem("Remove this menu item", () -> {
             if (menuToRemove != null) {
@@ -108,13 +113,16 @@ public class DemoUI extends UI {
     }
 
     private void initTreeMenu() {
-        sideMenu.addTreeItem("Tree item", () -> Notification.show("Parent!"));
-        sideMenu.addTreeItem("Tree item", "sub item", () -> {
+        MenuRegistration parentNode = sideMenu.addMenuItem("Tree item",
+                () -> Notification.show("Parent!"));
+        parentNode.addSubMenu("sub item", () -> {
             Notification.show("Sub item!");
             sideMenu.addComponent(new Button("Add sub sub item",
-                    event -> subSubTreeItem = sideMenu.addTreeItem("sub item",
-                            "sub sub item",
-                            () -> Notification.show("Inception!"))));
+                    event -> subSubTreeItem = parentNode.getSubMenu("sub item")
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Sub menu not available."))
+                            .addSubMenu("sub sub item",
+                                    () -> Notification.show("Inception!"))));
             sideMenu.addComponent(new Button("Remove sub sub item", event -> {
                 if (null != subSubTreeItem) {
                     subSubTreeItem.remove();
