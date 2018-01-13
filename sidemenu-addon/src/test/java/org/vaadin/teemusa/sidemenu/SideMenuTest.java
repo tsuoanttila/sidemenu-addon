@@ -1,13 +1,13 @@
 package org.vaadin.teemusa.sidemenu;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.vaadin.teemusa.sidemenu.SideMenu.MenuRegistration;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SideMenuTest {
@@ -33,15 +33,14 @@ public class SideMenuTest {
         verify(clickHandler, times(1)).click();
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void addRootItemRepeat() {
         SideMenu sideMenu = new SideMenu();
         sideMenu.addMenuItem("item", clickHandler);
         sideMenu.addMenuItem("item", clickHandler);
-        // expect no exception
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void addSubItemRepeat() {
         SideMenu sideMenu = new SideMenu();
         MenuRegistration parent = sideMenu.addMenuItem("item", clickHandler);
@@ -49,13 +48,12 @@ public class SideMenuTest {
         parent.addSubMenu("foo", null);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void addTreeItemSubRepeat() {
         SideMenu sideMenu = new SideMenu();
         sideMenu.addMenuItem("parent1", clickHandler).addSubMenu("item",
                 clickHandler);
         sideMenu.addMenuItem("parent2", clickHandler).addSubMenu("item",
                 clickHandler);
-        // expect no exception
     }
 }

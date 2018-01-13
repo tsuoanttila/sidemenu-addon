@@ -1,10 +1,5 @@
 package org.vaadin.teemusa.sidemenu.demo;
 
-import javax.servlet.annotation.WebServlet;
-
-import org.vaadin.teemusa.sidemenu.SideMenu;
-import org.vaadin.teemusa.sidemenu.SideMenu.MenuRegistration;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -23,13 +18,18 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import org.vaadin.teemusa.sidemenu.SideMenu;
+import org.vaadin.teemusa.sidemenu.SideMenu.MenuRegistration;
+
+import javax.servlet.annotation.WebServlet;
+import java.util.Optional;
 
 @Theme("demo")
 @Title("SideMenu Add-on Demo")
 @Viewport("user-scalable=no,initial-scale=1.0")
 public class DemoUI extends UI {
 
-    private final class FooView extends VerticalLayout implements View {
+    private static final class FooView extends VerticalLayout implements View {
 
         public FooView(String text) {
             addComponent(new Label(text));
@@ -123,11 +123,16 @@ public class DemoUI extends UI {
                                     "Sub menu not available."))
                             .addSubMenu("sub sub item",
                                     () -> Notification.show("Inception!"))));
+            sideMenu.addComponent(new Button("Select sub sub item", event -> Optional.ofNullable(subSubTreeItem).ifPresent(MenuRegistration::select)));
             sideMenu.addComponent(new Button("Remove sub sub item", event -> {
                 if (null != subSubTreeItem) {
                     subSubTreeItem.remove();
                     subSubTreeItem = null;
                 }
+            }));
+            sideMenu.addComponent(new Button("Clear and re-add a tree menu item. FIXME: won't work since ensureTreeAdded() is removed", event -> {
+                sideMenu.clearMenu();
+                sideMenu.addMenuItem("Reborn", () -> Notification.show("Reborn!"));
             }));
         });
     }
