@@ -1,11 +1,5 @@
 package org.vaadin.teemusa.sidemenu;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.vaadin.data.TreeData;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
@@ -13,6 +7,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.MenuBar;
@@ -20,8 +15,13 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A helper component to make it easy to create menus like the one in the
@@ -168,7 +168,7 @@ public class SideMenu extends HorizontalLayout {
 
         private void ensureNoDuplicate(String text) {
             getSubMenu(text).ifPresent(subMenu -> {
-                throw new IllegalStateException("Duplicate menu entry");
+                throw new IllegalArgumentException(String.format("Duplicate menu entry. '%s' already exists", text));
             });
         }
     }
@@ -295,8 +295,7 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-     * Add a sub tree item to the menu. If it already exists, nothing happens
-     * and the existing {@link MenuRegistration} is returned
+     * Add a sub tree item to the menu. Existing registration will be overridden.
      *
      * @param parent
      *            caption of the parent item of the item to be added
@@ -311,11 +310,10 @@ public class SideMenu extends HorizontalLayout {
             Resource icon, MenuClickHandler clickHandler) {
         MenuEntry entry = new MenuEntry(item, icon, clickHandler);
         treeMenuData.addItem(parent, entry);
-        return registerTreeMenuItem(entry, clickHandler);
+        return registerTreeMenuItem(entry);
     }
 
-    private MenuRegistration registerTreeMenuItem(MenuEntry treeItem,
-            MenuClickHandler clickHandler) {
+    private MenuRegistration registerTreeMenuItem(MenuEntry treeItem) {
         treeMenu.getDataProvider().refreshAll();
         MenuRegistration registration = new MenuRegistrationImpl(treeItem,
                 () -> {
