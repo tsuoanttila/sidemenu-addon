@@ -1,11 +1,15 @@
 package org.vaadin.teemusa.sidemenu;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
 import com.vaadin.data.TreeData;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.Resource;
-import com.vaadin.server.Responsive;
-import com.vaadin.server.SerializableConsumer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -16,13 +20,8 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.themes.ValoTheme;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A helper component to make it easy to create menus like the one in the
@@ -41,8 +40,8 @@ import java.util.Optional;
 public class SideMenu extends HorizontalLayout {
 
     /**
-	 * A simple lambda compatible handler class for executing code when a menu
-	 * entry is clicked.
+     * A simple lambda compatible handler class for executing code when a menu
+     * entry is clicked.
      */
     public interface MenuClickHandler extends Serializable {
 
@@ -60,7 +59,8 @@ public class SideMenu extends HorizontalLayout {
     public interface MenuRegistration extends Serializable {
 
         /**
-         * Select the menu object associated with this registration. If it's a tree menu item, it'll also be expanded w/ children items
+         * Select the menu object associated with this registration. If it's a
+         * tree menu item, it'll also be expanded w/ children items
          */
         void select();
 
@@ -68,29 +68,108 @@ public class SideMenu extends HorizontalLayout {
          * Removes the menu object associated with this registration.
          */
         void remove();
+
+        /**
+         * Adds a sub menu to this menu entry.
+         *
+         * @param text
+         *            the menu text for the sub menu
+         * @param clickHandler
+         *            the click handler for the sub menu
+         *
+         * @return a menu registration for the sub menu
+         */
+        MenuRegistration addSubMenu(String text, MenuClickHandler clickHandler);
+
+        /**
+         * Adds a sub menu to this menu entry with icon.
+         * 
+         * @param text
+         *            the menu text for the sub menu
+         * @param icon
+         *            the menu icon for the sub menu
+         * @param clickHandler
+         *            the click handler for the sub menu
+         * 
+         * @return a menu registration for the sub menu
+         */
+        MenuRegistration addSubMenu(String text, Resource icon,
+                MenuClickHandler clickHandler);
+
+        /**
+         * Gets the menu entry for this menu.
+         * 
+         * @return the menu entry
+         */
+        MenuEntry getMenuEntry();
+
+        /**
+         * Finds a menu entry for a sub menu based on the menu text.
+         * 
+         * @param text
+         *            the menu text of the sub menu
+         * @return optional of sub menu entry
+         */
+        Optional<MenuRegistration> getSubMenu(String text);
     }
 
-    private final class MenuRegistrationImpl<T> implements MenuRegistration {
+    private final class MenuRegistrationImpl implements MenuRegistration {
 
-        private SerializableConsumer<T> selectMethod;
-        private SerializableConsumer<T> removeMethod;
-        private T menuItem;
+        private MenuClickHandler removeMethod;
+        private MenuEntry menuItem;
+        private boolean removed = false;
 
-		public MenuRegistrationImpl(T menuItem, SerializableConsumer<T> selectMethod,
-				SerializableConsumer<T> removeMethod) {
+        public MenuRegistrationImpl(MenuEntry menuItem,
+                MenuClickHandler removeMethod) {
             this.menuItem = menuItem;
-            this.selectMethod = selectMethod;
             this.removeMethod = removeMethod;
         }
 
         @Override
         public void select() {
-            selectMethod.accept(menuItem);
+            assert !removed : "Actions on an already removed menu entry";
+            Optional.ofNullable(menuItem.getClickHandler())
+                    .ifPresent(MenuClickHandler::click);
         }
 
         @Override
         public void remove() {
-            removeMethod.accept(menuItem);
+            assert !removed : "Actions on an already removed menu entry";
+            removeMethod.click();
+            removed = true;
+        }
+
+        @Override
+        public MenuRegistration addSubMenu(String text,
+                MenuClickHandler clickHandler) {
+            return addSubMenu(text, null, clickHandler);
+        }
+
+        @Override
+        public MenuRegistration addSubMenu(String text, Resource icon,
+                MenuClickHandler clickHandler) {
+            assert !removed : "Actions on an already removed menu entry";
+            ensureNoDuplicate(text);
+            return addTreeItem(menuItem, text, icon, clickHandler);
+        }
+
+        @Override
+        public MenuEntry getMenuEntry() {
+            treeMenu.getDataProvider().refreshItem(menuItem);
+            return menuItem;
+        }
+
+        @Override
+        public Optional<MenuRegistration> getSubMenu(String text) {
+            return treeMenuData.getChildren(menuItem).stream()
+                    .filter(menuEntry -> menuEntry.getMenuText().equals(text))
+                    .map(treeMenuItemToRegistration::get).findFirst();
+        }
+
+        private void ensureNoDuplicate(String text) {
+            getSubMenu(text).ifPresent(subMenu -> {
+                throw new IllegalStateException("Duplicate menu entry");
+            });
         }
     }
 
@@ -103,10 +182,9 @@ public class SideMenu extends HorizontalLayout {
     private final CssLayout menuItemsLayout = new CssLayout();
     private final MenuBar userMenu = new MenuBar();
 
-    private final Tree<String> treeMenu = new Tree<>();
-    private final TreeData<String> treeMenuData = new TreeData<>();
-    private final Map<String, MenuClickHandler> treeMenuItemToClick = new HashMap<>();
-    private final Map<String, MenuRegistration> treeMenuItemToRegistration = new HashMap<>();
+    private final Tree<MenuEntry> treeMenu = new Tree<>();
+    private final TreeData<MenuEntry> treeMenuData = new TreeData<>();
+    private final Map<MenuEntry, MenuRegistration> treeMenuItemToRegistration = new HashMap<>();
 
     /* Quick access to user drop down menu */
     private MenuItem userItem;
@@ -116,14 +194,14 @@ public class SideMenu extends HorizontalLayout {
     private Image menuImage;
 
     /**
-	 * Constructor for creating a SideMenu component. This method sets up all
-	 * the components and styles needed for the side menu.
+     * Constructor for creating a SideMenu component. This method sets up all
+     * the components and styles needed for the side menu.
      */
     public SideMenu() {
         super();
         setSpacing(false);
         addStyleName(ValoTheme.UI_WITH_MENU);
-        Responsive.makeResponsive(this);
+        // Responsive.makeResponsive(this);
         setSizeFull();
 
         menuArea.setPrimaryStyleName("valo-menu");
@@ -156,21 +234,19 @@ public class SideMenu extends HorizontalLayout {
         valoMenuToggleButton.addStyleName(ValoTheme.BUTTON_SMALL);
         menuArea.addComponent(valoMenuToggleButton);
 
-		menuItemsLayout.addStyleName("valo-menuitems");
+        menuItemsLayout.addStyleName("valo-menuitems");
 
         treeMenu.setTreeData(treeMenuData);
-        treeMenu.asSingleSelect().addValueChangeListener(event -> {
-                if ( !event.isUserOriginated()) {
-                    return;
-                }
-                if (null == event.getValue()) {
-                    // Workaround to disable deselect
-                    treeMenu.select(event.getOldValue());
-                } else {
-                    Optional.ofNullable(treeMenuItemToClick.get(event.getValue())).ifPresent(MenuClickHandler::click);
-                }
-            });
+        treeMenu.setSelectionMode(SelectionMode.NONE);
+        treeMenu.setItemIconGenerator(MenuEntry::getMenuIcon);
+        treeMenu.setItemCaptionGenerator(MenuEntry::getMenuText);
+        treeMenu.setStyleGenerator(menuEntry -> "valo-menu-item");
+        treeMenu.setWidth("200px");
+        treeMenu.addItemClickListener(
+                event -> Optional.ofNullable(event.getItem().getClickHandler())
+                        .ifPresent(MenuClickHandler::click));
         menuArea.addComponent(menuItemsLayout);
+        menuItemsLayout.addComponent(treeMenu);
 
         contentArea.setPrimaryStyleName("valo-content");
         contentArea.addStyleName("v-scrollable");
@@ -186,13 +262,13 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-	 * Adds a menu entry. The given handler is called when the user clicks the
-	 * entry.
-	 *
-	 * @param text
-	 *            menu text
-	 * @param handler
-	 *            menu click handler
+     * Adds a root level menu entry. The given handler is called when the user
+     * clicks the entry.
+     *
+     * @param text
+     *            menu text
+     * @param handler
+     *            menu click handler
      *
      * @return menu registration
      */
@@ -201,129 +277,103 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-	 * Adds a menu entry with given icon. The given handler is called when the
-	 * user clicks the entry.
-	 *
-	 * @param text
-	 *            menu text
-	 * @param icon
-	 *            menu icon
-	 * @param handler
-	 *            menu click handler
+     * Adds a root level menu entry with given icon. The given handler is called
+     * when the user clicks the entry.
+     *
+     * @param text
+     *            menu text
+     * @param icon
+     *            menu icon
+     * @param handler
+     *            menu click handler
      *
      * @return menu registration
      */
-    public MenuRegistration addMenuItem(String text, Resource icon, final MenuClickHandler handler) {
-        Button button = new Button(text, event -> {
-            handler.click();
-            menuArea.removeStyleName(STYLE_VISIBLE);
-        });
-        button.setIcon(icon);
-        button.setPrimaryStyleName("valo-menu-item");
-        menuItemsLayout.addComponent(button);
-        return new MenuRegistrationImpl<>(button, Button::click, menuItemsLayout::removeComponent);
+    public MenuRegistration addMenuItem(String text, Resource icon,
+            final MenuClickHandler handler) {
+        return addTreeItem(null, text, icon, handler);
     }
 
     /**
-     * Add a root tree item to the menu. If it already exists, nothing happens and the existing {@link MenuRegistration} is returned
+     * Add a sub tree item to the menu. If it already exists, nothing happens
+     * and the existing {@link MenuRegistration} is returned
      *
-     * @param rootItem caption of the root item, must be unique among all items incl. root/sub items
-     * @param clickHandler triggered if the specified item is selected
+     * @param parent
+     *            caption of the parent item of the item to be added
+     * @param item
+     *            caption of the sub item, must be unique among all items incl.
+     *            root/sub items
+     * @param clickHandler
+     *            triggered if the specified item is selected
      * @return MenuRegistration of the added item
      */
-    public MenuRegistration addTreeItem(String rootItem, MenuClickHandler clickHandler) {
-        ensureTreeAdded();
-        MenuRegistration existingRegistration = treeMenuItemToRegistration.get(rootItem);
-        if (null != existingRegistration) {
-            return existingRegistration;
-        }
-        treeMenuData.addRootItems(rootItem);
-        return registerTreeMenuItem(rootItem, clickHandler);
+    protected MenuRegistration addTreeItem(MenuEntry parent, String item,
+            Resource icon, MenuClickHandler clickHandler) {
+        MenuEntry entry = new MenuEntry(item, icon, clickHandler);
+        treeMenuData.addItem(parent, entry);
+        return registerTreeMenuItem(entry, clickHandler);
     }
 
-    /**
-     * Add a sub tree item to the menu. If it already exists, nothing happens and the existing {@link MenuRegistration} is returned
-     *
-     * @param parent caption of the parent item of the item to be added
-     * @param item caption of the sub item, must be unique among all items incl. root/sub items
-     * @param clickHandler triggered if the specified item is selected
-     * @return MenuRegistration of the added item
-     */
-    public MenuRegistration addTreeItem(String parent, String item, MenuClickHandler clickHandler) {
-        ensureTreeAdded();
-        MenuRegistration existingRegistration = treeMenuItemToRegistration.get(item);
-        if (null != existingRegistration) {
-            return existingRegistration;
-        }
-        treeMenuData.addItem(parent, item);
-        return registerTreeMenuItem(item, clickHandler);
-    }
-
-    private MenuRegistration registerTreeMenuItem(String treeItem, MenuClickHandler clickHandler) {
+    private MenuRegistration registerTreeMenuItem(MenuEntry treeItem,
+            MenuClickHandler clickHandler) {
         treeMenu.getDataProvider().refreshAll();
-        treeMenuItemToClick.put(treeItem, clickHandler);
-        MenuRegistration registration = new MenuRegistrationImpl<>(treeItem, item -> {
-            // Tree "Bug": all parents must be explicitly expanded
-            for (String parent = item; null != parent; parent = treeMenuData.getParent(parent)) {
-                treeMenu.expand(parent);
-            }
-            treeMenu.select(item);
-        }, remove -> {
-            removeRegistration(remove);
-            treeMenuData.removeItem(remove);
-            treeMenu.getDataProvider().refreshAll();
-        });
+        MenuRegistration registration = new MenuRegistrationImpl(treeItem,
+                () -> {
+                    removeRegistration(treeItem);
+                    treeMenuData.removeItem(treeItem);
+                    treeMenu.getDataProvider().refreshAll();
+                });
         treeMenuItemToRegistration.put(treeItem, registration);
         return registration;
     }
 
-    private void removeRegistration(String remove) {
+    private void removeRegistration(MenuEntry remove) {
         treeMenuItemToRegistration.remove(remove);
-        treeMenuItemToClick.remove(remove);
-        treeMenuData.getChildren(remove).stream().filter(Objects::nonNull).forEach(this::removeRegistration);
-    }
-
-    private void ensureTreeAdded() {
-        if (menuItemsLayout.getComponentIndex(treeMenu) == -1) {
-            menuItemsLayout.addComponent(treeMenu);
-        }
+        treeMenuData.getChildren(remove).stream().filter(Objects::nonNull)
+                .forEach(this::removeRegistration);
     }
 
     /**
-     * Adds a menu entry to the user drop down menu. The given handler is called when the user clicks the entry.
+     * Adds a menu entry to the user drop down menu. The given handler is called
+     * when the user clicks the entry.
      *
-     * @param text menu text
-     * @param handler menu click handler
+     * @param text
+     *            menu text
+     * @param handler
+     *            menu click handler
      * @return menu registration
      */
-    public MenuRegistration addUserMenuItem(String text, MenuClickHandler handler) {
+    public MenuRegistration addUserMenuItem(String text,
+            MenuClickHandler handler) {
         return addUserMenuItem(text, null, handler);
     }
 
     /**
-	 * Adds a menu entry to the user drop down menu with given icon. The given
-	 * handler is called when the user clicks the entry.
-	 *
-	 * @param text
-	 *            menu text
-	 * @param icon
-	 *            menu icon
-	 * @param handler
-	 *            menu click handler
+     * Adds a menu entry to the user drop down menu with given icon. The given
+     * handler is called when the user clicks the entry.
+     *
+     * @param text
+     *            menu text
+     * @param icon
+     *            menu icon
+     * @param handler
+     *            menu click handler
      *
      * @return menu registration
      */
-    public MenuRegistration addUserMenuItem(String text, Resource icon, final MenuClickHandler handler) {
+    public MenuRegistration addUserMenuItem(String text, Resource icon,
+            final MenuClickHandler handler) {
         Command menuCommand = selectedItem -> handler.click();
         MenuItem menuItem = userItem.addItem(text, icon, menuCommand);
-        return new MenuRegistrationImpl<>(menuItem, menuCommand::menuSelected, userItem::removeChild);
+        return new MenuRegistrationImpl(new MenuEntry(text, icon, handler),
+                () -> userItem.removeChild(menuItem));
     }
 
     /**
      * Sets the user name to be displayed in the menu.
      *
-	 * @param userName
-	 *            user name
+     * @param userName
+     *            user name
      */
     public void setUserName(String userName) {
         userItem.setText(userName);
@@ -332,19 +382,19 @@ public class SideMenu extends HorizontalLayout {
     /**
      * Sets the portrait of the user to be displayed in the menu.
      *
-	 * @param icon
-	 *            portrait of the user
+     * @param icon
+     *            portrait of the user
      */
     public void setUserIcon(Resource icon) {
         userItem.setIcon(icon);
     }
 
     /**
-	 * Sets the visibility of the whole user menu. This includes portrait, user
-	 * name and the drop down menu.
+     * Sets the visibility of the whole user menu. This includes portrait, user
+     * name and the drop down menu.
      *
-	 * @param visible
-	 *            user menu visibility
+     * @param visible
+     *            user menu visibility
      */
     public void setUserMenuVisible(boolean visible) {
         userMenu.setVisible(visible);
@@ -362,8 +412,8 @@ public class SideMenu extends HorizontalLayout {
     /**
      * Sets the title text for the menu
      *
-	 * @param caption
-	 *            menu title
+     * @param caption
+     *            menu title
      */
     public void setMenuCaption(String caption) {
         setMenuCaption(caption, null);
@@ -372,10 +422,10 @@ public class SideMenu extends HorizontalLayout {
     /**
      * Sets the title caption and logo for the menu
      *
-	 * @param caption
-	 *            menu caption
-	 * @param logo
-	 *            menu logo
+     * @param caption
+     *            menu caption
+     * @param logo
+     *            menu logo
      */
     public void setMenuCaption(String caption, Resource logo) {
         if (menuImage != null) {
@@ -399,18 +449,17 @@ public class SideMenu extends HorizontalLayout {
     public void clearMenu() {
         menuItemsLayout.removeAllComponents();
         treeMenuData.clear();
-        treeMenuItemToClick.clear();
         treeMenuItemToRegistration.clear();
     }
 
     /**
      * Adds a menu entry to navigate to given navigation state.
      *
-	 * @param text
-	 *            text to display in menu
-	 * @param navigationState
-	 *            state to navigate to
-	 *
+     * @param text
+     *            text to display in menu
+     * @param navigationState
+     *            state to navigate to
+     *
      * @return menu registration
      */
     public MenuRegistration addNavigation(String text, String navigationState) {
@@ -420,17 +469,19 @@ public class SideMenu extends HorizontalLayout {
     /**
      * Adds a menu entry with given icon to navigate to given navigation state.
      *
-	 * @param text
-	 *            text to display in menu
-	 * @param icon
-	 *            icon to display in menu
-	 * @param navigationState
-	 *            state to navigate to
-	 *
+     * @param text
+     *            text to display in menu
+     * @param icon
+     *            icon to display in menu
+     * @param navigationState
+     *            state to navigate to
+     *
      * @return menu registration
      */
-    public MenuRegistration addNavigation(String text, Resource icon, final String navigationState) {
-        return addMenuItem(text, icon, () -> getUI().getNavigator().navigateTo(navigationState));
+    public MenuRegistration addNavigation(String text, Resource icon,
+            final String navigationState) {
+        return addMenuItem(text, icon,
+                () -> getUI().getNavigator().navigateTo(navigationState));
     }
 
     /**
@@ -450,11 +501,11 @@ public class SideMenu extends HorizontalLayout {
     }
 
     /**
-	 * Removes all content from the content area and replaces everything with
-	 * given component.
+     * Removes all content from the content area and replaces everything with
+     * given component.
      *
-	 * @param content
-	 *            new content to display
+     * @param content
+     *            new content to display
      */
     public void setContent(Component content) {
         contentArea.removeAllComponents();

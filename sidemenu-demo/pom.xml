@@ -5,7 +5,7 @@
 	<groupId>org.vaadin.teemusa</groupId>
 	<artifactId>sidemenu-demo</artifactId>
 	<packaging>war</packaging>
-	<version>2.1-SNAPSHOT</version>
+	<version>3.0-SNAPSHOT</version>
 	<name>SideMenu Add-on Demo</name>
 
 	<prerequisites>
